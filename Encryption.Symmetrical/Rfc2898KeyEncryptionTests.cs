@@ -29,9 +29,9 @@ namespace Encryption.Symmetrical
 
     public class Rfc2898KeyEncryptionTests : SymmetricalEncryptionTestsBase
     {
-        readonly Func<string, byte[], int, Rfc2898DeriveBytesBase> _tFactory;
+        readonly Func<string, byte[], uint, Rfc2898DeriveBytesBase> _tFactory;
 
-        protected Rfc2898KeyEncryptionTests(Func<string, byte[], int, Rfc2898DeriveBytesBase> tFactory)
+        protected Rfc2898KeyEncryptionTests(Func<string, byte[], uint, Rfc2898DeriveBytesBase> tFactory)
         {
             _tFactory = tFactory;
         }

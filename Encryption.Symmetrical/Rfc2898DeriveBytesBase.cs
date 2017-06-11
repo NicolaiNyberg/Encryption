@@ -6,30 +6,30 @@ namespace Encryption.Symmetrical
 {
     public class Rfc2898DeriveBytesSha1 : Rfc2898DeriveBytesBase
     {
-        public Rfc2898DeriveBytesSha1(string password, byte[] salt, int iterations)
+        public Rfc2898DeriveBytesSha1(string password, byte[] salt, uint iterations)
             : this(new UTF8Encoding(false).GetBytes(password), salt, iterations) { }
 
-        public Rfc2898DeriveBytesSha1(byte[] password, byte[] salt, int iterations)
+        public Rfc2898DeriveBytesSha1(byte[] password, byte[] salt, uint iterations)
             : base(salt, iterations, new HMACSHA1(password))
         { }
     }
 
     public class Rfc2898DeriveBytesSha256 : Rfc2898DeriveBytesBase
     {
-        public Rfc2898DeriveBytesSha256(string password, byte[] salt, int iterations)
+        public Rfc2898DeriveBytesSha256(string password, byte[] salt, uint iterations)
             : this(new UTF8Encoding(false).GetBytes(password), salt, iterations) { }
 
-        public Rfc2898DeriveBytesSha256(byte[] password, byte[] salt, int iterations)
+        public Rfc2898DeriveBytesSha256(byte[] password, byte[] salt, uint iterations)
             : base(salt, iterations, new HMACSHA256(password))
         { }
     }
 
     public class Rfc2898DeriveBytesSha384 : Rfc2898DeriveBytesBase
     {
-        public Rfc2898DeriveBytesSha384(string password, byte[] salt, int iterations)
+        public Rfc2898DeriveBytesSha384(string password, byte[] salt, uint iterations)
             : this(new UTF8Encoding(false).GetBytes(password), salt, iterations) { }
 
-        public Rfc2898DeriveBytesSha384(byte[] password, byte[] salt, int iterations)
+        public Rfc2898DeriveBytesSha384(byte[] password, byte[] salt, uint iterations)
             : base(salt, iterations, new HMACSHA384(password))
         { }
     }
@@ -37,56 +37,35 @@ namespace Encryption.Symmetrical
     // Inparticular SHA512 is not GPU-friendly
     public class Rfc2898DeriveBytesSha512 : Rfc2898DeriveBytesBase
     {
-        public Rfc2898DeriveBytesSha512(string password, byte[] salt, int iterations)
+        public Rfc2898DeriveBytesSha512(string password, byte[] salt, uint iterations)
             : this(new UTF8Encoding(false).GetBytes(password), salt, iterations) { }
 
-        public Rfc2898DeriveBytesSha512(byte[] password, byte[] salt, int iterations)
+        public Rfc2898DeriveBytesSha512(byte[] password, byte[] salt, uint iterations)
             : base(salt, iterations, new HMACSHA512(password))
         { }
     }
 
-    // Converted from Microsofts Rfc2898DeriveBytes.
+    // Converted from Microsoft's Rfc2898DeriveBytes.
     // Implements PBKDF2 using a customizable HMAC
     public abstract class Rfc2898DeriveBytesBase
         : DeriveBytes
     {
+        readonly byte[] _salt;
+        readonly uint _iterations;
         readonly HMAC _hmac;
         byte[] _buffer;
-        byte[] _salt;
-
-        uint _iterations;
         uint _block;
         int _startIndex;
         int _endIndex;
 
         const int BlockSize = 20;
 
-        protected Rfc2898DeriveBytesBase(byte[] salt, int iterations, HMAC hmac)
+        protected Rfc2898DeriveBytesBase(byte[] salt, uint iterations, HMAC hmac)
         {
-            Salt = salt;
-            IterationCount = iterations;
+            _salt = salt;
+            _iterations = iterations;
             _hmac = hmac;
             Initialize();
-        }
-
-        public int IterationCount
-        {
-            get { return (int)_iterations; }
-            set
-            {
-                _iterations = (uint)value;
-                Initialize();
-            }
-        }
-
-        public byte[] Salt
-        {
-            get { return (byte[])_salt.Clone(); }
-            set
-            {
-                _salt = (byte[])value.Clone();
-                Initialize();
-            }
         }
 
         [System.Security.SecuritySafeCritical]  // auto-generated
@@ -163,7 +142,7 @@ namespace Encryption.Symmetrical
         // where i is the block number. 
         byte[] Func()
         {
-            var intBlock = UnitToBigEndianBytes(_block);
+            var intBlock = UintToBigEndianBytes(_block);
 
             _hmac.TransformBlock(_salt, 0, _salt.Length, _salt, 0);
             _hmac.TransformFinalBlock(intBlock, 0, intBlock.Length);
@@ -186,7 +165,7 @@ namespace Encryption.Symmetrical
         }
 
         // encodes the integer i into a 4-byte array, in big endian. 
-        static byte[] UnitToBigEndianBytes(uint i)
+        static byte[] UintToBigEndianBytes(uint i)
         {
             var b = BitConverter.GetBytes(i);
             byte[] littleEndianBytes = { b[3], b[2], b[1], b[0] };
